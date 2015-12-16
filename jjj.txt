@@ -1,5 +1,2 @@
-<<<<<<< HEAD
-kadabra hhhkjgkg 757
-=======
 kadabra alakazam 66
->>>>>>> refs/remotes/origin/test
+
