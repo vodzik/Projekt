@@ -19,6 +19,16 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
     refreash = new refreasher(this);  //twoezenie instancji wątku zegara odświerzania
     connect(refreash,SIGNAL(Tick()),this,SLOT(onTick())); //łaczenie sygnału odświeżania Tick() ze slotem onTick()
     refreash->start();  //start wątku
+
+    int i,j;
+    for(i=0;i<21;i++)  //definicja stanu poczatkowego
+    {
+        for(j=0;j<26;j++)
+        {
+            if((i==1||i==3||i==4||i==6||i==7||i==9||i==10||i==12||i==13||i==15)&&j>0&&j<25) stan[i][j]=2;
+            else stan[i][j]=0;
+        }
+    }
 }
 
 MainWindow::~MainWindow()
@@ -35,17 +45,9 @@ void MainWindow::onTick() //obsługa sygnału Tick()
 
 void MainWindow::rysuj()  //funkcja rysująca
 {
-    int stan[21][26];
-    int i,j;
-    for(i=0;i<21;i++)
-    {
-        for(j=0;j<26;j++)
-        {
-            stan[i][j]=i%6;
-        }
-    }
 
-    int puste=0;
+
+    int puste=0;            //parametry interpretacji
     int zarezerwowane=1;
     int polka=2;
     int wozek=3;

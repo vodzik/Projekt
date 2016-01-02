@@ -15,6 +15,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+
+    int stan[21][26];  //tablica przechowująca stan do wyswietlania
     void rysuj();  //funkcja rysująca
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
