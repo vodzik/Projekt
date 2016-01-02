@@ -13,9 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    refreasher.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    refreasher.h
 
 FORMS    += mainwindow.ui
 
