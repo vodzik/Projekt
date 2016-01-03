@@ -20,13 +20,19 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
     connect(refreash,SIGNAL(Tick()),this,SLOT(onTick())); //łaczenie sygnału odświeżania Tick() ze slotem onTick()
     refreash->start();  //start wątku
 
+
+    driver=new sterownik(this); //tworzenie instancji wątku sterownika
+    connect(driver,SIGNAL(Wyslijstan(int**)),this,SLOT(Odbierzstan(int**))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
+    driver->start();  //start wątku
+
     int i,j;
     for(i=0;i<21;i++)  //definicja stanu poczatkowego
     {
         for(j=0;j<26;j++)
         {
-            if((i==1||i==3||i==4||i==6||i==7||i==9||i==10||i==12||i==13||i==15)&&j>0&&j<25) stan[i][j]=2;
-            else stan[i][j]=0;
+            //if((i==1||i==3||i==4||i==6||i==7||i==9||i==10||i==12||i==13||i==15)&&j>0&&j<25) stan[i][j]=2;
+            //else
+            stan[i][j]=0;
         }
     }
 }
@@ -42,6 +48,18 @@ void MainWindow::onTick() //obsługa sygnału Tick()
     rysuj();
 }
 
+void MainWindow::Odbierzstan(int **stana) //obsługa sygnału Odbierzstan()
+{
+    int i,j;
+    for(i=0;i<21;i++)
+    {
+        for(j=0;j<26;j++)
+        {
+
+            stan[i][j]=stana[i][j];
+        }
+    }
+}
 
 void MainWindow::rysuj()  //funkcja rysująca
 {

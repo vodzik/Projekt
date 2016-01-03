@@ -5,6 +5,7 @@
 #include <QPixmap>
 
 #include "refreasher.h"
+#include "sterownik.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,10 +22,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     refreasher *refreash; //obiekt inicjalizujący wątek zegara odświerzającego
-
+    sterownik *driver; //obiekt inicjalizujący wątek sterownika
 public slots:
 
-    void onTick();  // clot wylapujący stgnał zegara odświerzającego
+    void onTick();  // slot wylapujący sygnał zegara odświerzającego
+    void Odbierzstan(int**); //slot wdbierający stan planszy
 
 private:
 
