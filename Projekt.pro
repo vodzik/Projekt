@@ -24,6 +24,10 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui
 
 RESOURCES += \
-    zasoby.qrc
+    zasoby.qrc \
+    pawelu.qrc
+
+DISTFILES += \
+    pawelu.png
 
 

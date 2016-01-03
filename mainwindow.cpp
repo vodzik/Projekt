@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
     ui->setupUi(this);
 
     // zmienne linkujace obrazki
-    mpusty.load(":/new/images/puste.png");
+    mpusty.load(":/new/images/pawelu.png");
     mzarezerwowany.load(":/new/images/rezerwacja.png");
     mwozek.load(":/new/images/wuzek.png");
     mpolka.load(":/new/images/szafa.png");

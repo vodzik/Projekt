@@ -12,6 +12,7 @@
         <file>roz2.png</file>
         <file>roz3.png</file>
         <file>roz4.png</file>
+        <file>pawelu.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

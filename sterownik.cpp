@@ -21,7 +21,7 @@ void sterownik::run()
     while(1)
     {
         emit Wyslijstan(stan);
-        this->msleep(200);
+        this->msleep(2000);
 
         for(i=0;i<21;i++)
         {
