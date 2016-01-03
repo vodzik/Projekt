@@ -15,11 +15,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     refreasher.cpp \
-    sterownik.cpp
+    sterownik.cpp \
+    shelf.cpp \
+    coordinates.cpp
 
 HEADERS  += mainwindow.h \
     refreasher.h \
-    sterownik.h
+    sterownik.h \
+    shelf.h \
+    coordinates.h
 
 FORMS    += mainwindow.ui
 
