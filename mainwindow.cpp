@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
     mwozekpolka.load(":/new/images/szafa+wuzek.png");
     mwozekpolkadok.load(":/new/images/szafa+wuzek-dok.png");
 
+    qsrand(QTime::currentTime().msec()); // inicjalizacja ciągu pseudolosowego;
+
     refreash = new refreasher(this);  //twoezenie instancji wątku zegara odświerzania
     connect(refreash,SIGNAL(Tick()),this,SLOT(onTick())); //łaczenie sygnału odświeżania Tick() ze slotem onTick()
     refreash->start();  //start wątku
@@ -26,16 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
     connect(this,SIGNAL(WyslijZadanie(int,int)),driver,SLOT(OdbierzZadanie(int,int))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
     driver->start();  //start wątku
 
-    int i,j;
-    for(i=0;i<21;i++)  //definicja stanu poczatkowego
-    {
-        for(j=0;j<26;j++)
-        {
-            //if((i==1||i==3||i==4||i==6||i==7||i==9||i==10||i==12||i==13||i==15)&&j>0&&j<25) stan[i][j]=2;
-            //else
-            stan[i][j]=0;
-        }
-    }
+    logi="Start";
+    ui->Logi->setText(logi);
+
 }
 
 MainWindow::~MainWindow()
@@ -3052,3 +3047,20 @@ void MainWindow::on_pushButton_clicked()
     emit WyslijZadanie(ui->nr_polki->value(),ui->nr_stanowiska->value());
 }
 
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    emit WyslijZadanie((qrand()%240),(1+(qrand()%4)));
+}
+
+void MainWindow::OdbierzListeZadan(QString zadania)
+{
+    ui->ListaZadan->setText(zadania);
+}
+
+void MainWindow::OdbierzLogi(QString nowelogi)
+{
+    logi+='\n';
+    logi+=nowelogi;
+    ui->Logi->setText(logi);
+}

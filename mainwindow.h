@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QPixmap>
+#include <QtGlobal>
+#include <QString>
 
 #include "refreasher.h"
 #include "sterownik.h"
@@ -32,9 +34,13 @@ public slots:
 
     void onTick();  // slot wylapujący sygnał zegara odświerzającego
     void Odbierzstan(int**); //slot wdbierający stan planszy
+    void OdbierzListeZadan(QString);
+    void OdbierzLogi(QString);
 
 private slots:
     void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
 
 private:
 
@@ -45,7 +51,7 @@ private:
     QPixmap mpolka;
     QPixmap mwozekpolka;
     QPixmap mwozekpolkadok;
-
+    QString logi;
 
     Ui::MainWindow *ui;
 };
