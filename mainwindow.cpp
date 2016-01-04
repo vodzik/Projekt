@@ -3045,3 +3045,9 @@ if(stan[17][22]==wozekpolkadok) ui->roz4_8->setPixmap(mwozekpolkadok);
 
 
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    emit WyslijZadanie(ui->nr_polki->value(),ui->nr_stanowiska->value());
+}
+
