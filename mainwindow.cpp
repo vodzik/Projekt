@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
 
     driver=new sterownik(this); //tworzenie instancji wątku sterownika
     connect(driver,SIGNAL(Wyslijstan(int**)),this,SLOT(Odbierzstan(int**))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
+    connect(this,SIGNAL(WyslijZadanie(int,int)),driver,SLOT(OdbierzZadanie(int,int))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
     driver->start();  //start wątku
 
     int i,j;
@@ -3045,3 +3046,9 @@ if(stan[17][22]==wozekpolkadok) ui->roz4_8->setPixmap(mwozekpolkadok);
 
 
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    emit WyslijZadanie(ui->nr_polki->value(),ui->nr_stanowiska->value());
+}
+

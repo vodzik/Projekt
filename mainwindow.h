@@ -23,10 +23,18 @@ public:
     ~MainWindow();
     refreasher *refreash; //obiekt inicjalizujący wątek zegara odświerzającego
     sterownik *driver; //obiekt inicjalizujący wątek sterownika
+
+signals:
+
+    void WyslijZadanie(int, int);  //sygnał wysyłający zadanie
+
 public slots:
 
     void onTick();  // slot wylapujący sygnał zegara odświerzającego
     void Odbierzstan(int**); //slot wdbierający stan planszy
+
+private slots:
+    void on_pushButton_clicked();
 
 private:
 
