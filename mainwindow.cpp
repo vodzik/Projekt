@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
 
     driver=new sterownik(this); //tworzenie instancji wątku sterownika
     connect(driver,SIGNAL(Wyslijstan(int**)),this,SLOT(Odbierzstan(int**))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
+    connect(this,SIGNAL(WyslijZadanie(int,int)),driver,SLOT(OdbierzZadanie(int,int))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
     driver->start();  //start wątku
 
     int i,j;
