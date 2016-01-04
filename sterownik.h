@@ -26,7 +26,9 @@ public:
 signals:
     void Wyslijstan(int**);  //sygnal wysylajacy stan do wizualizacji
 
+
 public slots:
+    void OdbierzZadanie(int, int);  // pierwszy int - półka, drugi int - stanowisko
 
 private:
     void InicjalizujWektorPolek();    //Przypisuje wszystkim polką stany poczatkowe

@@ -1,27 +1,29 @@
 #include "sterownik.h"
 
+/* konstruktor klasy */
 sterownik::sterownik(QWidget *parent)
 {
-
     iloscpolek=240;
     InicjalizujWektorPolek();
     InicjalizujMacierzStanu();
-
-
+    OdswierzMacierzStanu();
 }
 
+/* "główna" funkcja wykonująca się w wątku sterownika */
+/* póki co wysyła tylko macierz stanu co 200ms do interfejsu */
 void sterownik::run()
 {
     while(1)
     {
-        OdswierzMacierzStanu();
+        //OdswierzMacierzStanu();
         emit Wyslijstan(stan);
         this->msleep(200);
-
-
     }
 }
 
+/* inicjalizacja wektora półek */
+/* tworzy wertor półek o długości ustawionej na sztywno w konstruktorze */
+/* definiuje położenia półek */
 void sterownik::InicjalizujWektorPolek()
 {
     polki=new shelf[iloscpolek];
@@ -45,6 +47,10 @@ void sterownik::InicjalizujWektorPolek()
     }
 }
 
+/* aktualizuje macierz stanu tablicy */
+/* póki co wpisuje tylko które pola są zajęte przez pólkę */
+/* TODO: trzeba też uwzględnić pozostałe możliwe stany */
+/* najlepiej będzie aktualizować poszczególne pola w momencie kiedy będą rozpatrywane ruchy i przydzielanie zasobów */
 void sterownik::OdswierzMacierzStanu()
 {
     int i,j;
@@ -57,7 +63,6 @@ void sterownik::OdswierzMacierzStanu()
     }
     for(i=0;i<iloscpolek;i++)
     {
-
         stan[polki[i].polorzenie_aktualne.Y][polki[i].polorzenie_aktualne.X]=2;
     }
 }
@@ -70,4 +75,9 @@ void sterownik::InicjalizujMacierzStanu()
     {
         stan[i]=new int[26];
     }
+}
+
+void sterownik::OdbierzZadanie(int npolki, int nstanowiska)
+{
+    stan[polki[npolki].polorzenie_bazowe.X][polki[npolki].polorzenie_bazowe.Y] = nstanowiska;
 }
