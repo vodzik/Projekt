@@ -8,10 +8,6 @@ public:
     coordinates();
     int X;
     int Y;
-
-
-
-
 };
 
 #endif // COORDINATES_H
