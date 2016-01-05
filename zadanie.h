@@ -8,9 +8,14 @@ using namespace std;
 class zadanie
 {
 public:
-    zadanie();
+    zadanie(int, int, coordinates, coordinates);
+
     int liczbaKrokow;
+    int numerPolki;
+    int numerStanowiska;
+    coordinates wpolrzednePolki;
+    coordinates wspolrzedneStanowska;
+
     list<coordinates> krok;
 };
-
 #endif // ZADANIE_H

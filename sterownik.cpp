@@ -81,6 +81,23 @@ void sterownik::InicjalizujMacierzStanu()
     }
 }
 
+/* zwraca adres stanowiska */
+coordinates sterownik::AdresStanowsika(int s)
+{
+    // adresy stanowisk ustawione są na sztywno
+    coordinates adres;
+    adres.Y = 17;
+    switch(s)
+    {
+    case 1: adres.X = 1; break;
+    case 2: adres.X = 8; break;
+    case 3: adres.X = 15; break;
+    case 4: adres.X = 22; break;
+    default: break;
+    }
+    return adres;
+}
+
 /* slot służy do odebrania zadania z wątku w którym działa interfejs */
 /* w slocie wywoływana jest funkcja dodająca nowe zadanie */
 void sterownik::OdbierzZadanie(int npolki, int nstanowiska)

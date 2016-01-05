@@ -40,6 +40,7 @@ private:
     void InicjalizujWektorPolek();    //Przypisuje wszystkim polką stany poczatkowe
     void OdswierzMacierzStanu();      //odswierza macierz stanu na podstawie polorzenia polek (i w przyszlosci roborów i zarezerwowanych pól)
     void InicjalizujMacierzStanu();   //alokuje pamięc dla macierzy stanu
+    coordinates AdresStanowsika(int); // zwraca adres stanowiska
 };
 
 #endif // STEROWNIK_H

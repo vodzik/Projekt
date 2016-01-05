@@ -17,13 +17,15 @@ SOURCES += main.cpp\
     refreasher.cpp \
     sterownik.cpp \
     shelf.cpp \
-    coordinates.cpp
+    coordinates.cpp \
+    zadanie.cpp
 
 HEADERS  += mainwindow.h \
     refreasher.h \
     sterownik.h \
     shelf.h \
-    coordinates.h
+    coordinates.h \
+    zadanie.h
 
 FORMS    += mainwindow.ui
 
