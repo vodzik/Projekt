@@ -19,4 +19,5 @@ signals:
 public slots:
 };
 
+
 #endif // REFREASHER_H

@@ -31,4 +31,8 @@ Makefile*
 
 #QtCtreator Qml
 *.qmlproject.user
+<<<<<<< HEAD
 *.qmlproject.user.*
+=======
+*.qmlproject.user.*
+>>>>>>> refs/remotes/origin/z3
