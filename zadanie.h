@@ -3,14 +3,22 @@
 
 #include <list>
 #include "coordinates.h"
+
 using namespace std;
 
 class zadanie
 {
 public:
-    zadanie();
+    zadanie(int p, int s, coordinates pxy, coordinates sxy);
+
     int liczbaKrokow;
+    int numerPolki;
+    int numerStanowiska;
+    coordinates wpolrzednePolki;
+    coordinates wspolrzedneStanowska;
+
+    void GenerujScierzke();
+
     list<coordinates> krok;
 };
-
 #endif // ZADANIE_H

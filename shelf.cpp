@@ -3,6 +3,7 @@
 shelf::shelf()
 {
 
+
 }
 
 bool shelf::CzyNaMiejscu()
