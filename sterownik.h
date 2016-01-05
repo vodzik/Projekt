@@ -11,6 +11,7 @@
 #include "shelf.h"
 #include "zadanie.h"
 #include "robot.h"
+#include "smith.h"
 
 
 using namespace std;
@@ -21,6 +22,7 @@ class sterownik : public QThread
 public:
     sterownik(QWidget *parent);  //konstruktor sterownika
 
+    Smith *agent;
     shelf *polki;    //wektor polek
 
     std::vector<Robot> robo_vector; // wektor zawiera roboty w systemie

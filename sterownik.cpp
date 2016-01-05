@@ -7,6 +7,7 @@ sterownik::sterownik(QWidget *parent)
     InicjalizujWektorPolek();
     InicjalizujMacierzStanu();
     OdswierzMacierzStanu();
+    agent = new Smith (this);
 }
 
 /* "główna" funkcja wykonująca się w wątku sterownika */

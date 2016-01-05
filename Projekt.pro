@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     shelf.cpp \
     coordinates.cpp \
     robot.cpp\
-    zadanie.cpp
+    zadanie.cpp\
+    smith.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -28,7 +29,8 @@ HEADERS  += mainwindow.h \
     shelf.h \
     coordinates.h \
     robot.h\
-    zadanie.h
+    zadanie.h\
+    smith.h
 
 
 FORMS    += mainwindow.ui
