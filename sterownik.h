@@ -13,6 +13,8 @@
 #include "robot.h"
 
 
+using namespace std;
+
 class sterownik : public QThread
 {
     Q_OBJECT
@@ -31,7 +33,7 @@ public:
 
     int ** mapa; // zmienna będzie zawierała mapę obszaru
                  // mapa jest wykorzystywana przy zdefiniowaniu listy kroków potrzebnych do wykonania zadania
-    std::list<zadanie> listaZadan;
+    std::list<zadanie*> listaZadan;
 
 signals:
     void Wyslijstan(int**);  //sygnal wysylajacy stan do wizualizacji
@@ -44,6 +46,7 @@ private:
     void InicjalizujWektorPolek();    //Przypisuje wszystkim polką stany poczatkowe
     void OdswierzMacierzStanu();      //odswierza macierz stanu na podstawie polorzenia polek (i w przyszlosci roborów i zarezerwowanych pól)
     void InicjalizujMacierzStanu();   //alokuje pamięc dla macierzy stanu
+    coordinates AdresStanowsika(int); // zwraca adres stanowiska
 };
 
 #endif // STEROWNIK_H

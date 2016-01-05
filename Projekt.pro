@@ -18,14 +18,22 @@ SOURCES += main.cpp\
     sterownik.cpp \
     shelf.cpp \
     coordinates.cpp \
+<<<<<<< HEAD
     robot.cpp
+=======
+    zadanie.cpp
+>>>>>>> refs/remotes/origin/z3
 
 HEADERS  += mainwindow.h \
     refreasher.h \
     sterownik.h \
     shelf.h \
     coordinates.h \
+<<<<<<< HEAD
     robot.h
+=======
+    zadanie.h
+>>>>>>> refs/remotes/origin/z3
 
 FORMS    += mainwindow.ui
 
