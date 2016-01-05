@@ -7,8 +7,10 @@
 #include <QtCore>
 #include <QDebug>
 #include <list>
+#include <vector>
 #include "shelf.h"
 #include "zadanie.h"
+#include "robot.h"
 
 
 class sterownik : public QThread
@@ -18,6 +20,8 @@ public:
     sterownik(QWidget *parent);  //konstruktor sterownika
 
     shelf *polki;    //wektor polek
+
+    std::vector<Robot> robo_vector; // wektor zawiera roboty w systemie
 
     int iloscpolek; //dlogosc wektora polek
 
