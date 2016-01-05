@@ -34,7 +34,7 @@ signals:
 public slots:
 
     void onTick();  // slot wylapujący sygnał zegara odświerzającego
-    void Odbierzstan(int**); //slot wdbierający stan planszy
+    void Odbierzstan(int**,double); //slot wdbierający stan planszy
     void OdbierzListeZadan(QString);
     void OdbierzLogi(QString);
 

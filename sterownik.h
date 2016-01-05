@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QtCore>
 #include <QDebug>
+#include <QString>
 #include <list>
 #include <vector>
 #include "shelf.h"
@@ -27,6 +28,10 @@ public:
 
     std::vector<Robot> robo_vector; // wektor zawiera roboty w systemie
 
+    int t;
+
+    int dt;
+
     int iloscpolek; //dlogosc wektora polek
 
     void run(); //glowna petla watku
@@ -38,13 +43,16 @@ public:
     std::list<zadanie*> listaZadan;
 
 signals:
-    void Wyslijstan(int**);  //sygnal wysylajacy stan do wizualizacji
-
+    void Wyslijstan(int**, double);  //sygnal wysylajacy stan do wizualizacji
+    void WyslijLogi(QString);  //wysłanie logów
 
 public slots:
     void OdbierzZadanie(int, int);  // pierwszy int - półka, drugi int - stanowisko
+    void OdbierzZegar(int, int);  // t,dt
+
 
 private:
+    double time();
     void InicjalizujWektorPolek();    //Przypisuje wszystkim polką stany poczatkowe
     void OdswierzMacierzStanu();      //odswierza macierz stanu na podstawie polorzenia polek (i w przyszlosci roborów i zarezerwowanych pól)
     void InicjalizujMacierzStanu();   //alokuje pamięc dla macierzy stanu

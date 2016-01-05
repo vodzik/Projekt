@@ -8,6 +8,8 @@ sterownik::sterownik(QWidget *parent)
     InicjalizujMacierzStanu();
     OdswierzMacierzStanu();
     agent = new Smith (this);
+    connect(agent,SIGNAL(clock(int,int)),this,SLOT(OdbierzZegar(int,int)));
+    agent->start();
 }
 
 /* "główna" funkcja wykonująca się w wątku sterownika */
@@ -17,7 +19,7 @@ void sterownik::run()
     while(1)
     {
         OdswierzMacierzStanu();
-        emit Wyslijstan(stan);
+        emit Wyslijstan(stan,time());
         this->msleep(200);
     }
 }
@@ -120,7 +122,24 @@ void sterownik::OdbierzZadanie(int npolki, int nstanowiska)
     // wrzucenie zadania na listę
     listaZadan.push_back(z1);
 
+    QString log;
 
+    log = QString::number(time(),'g',6);
+    log=log + "s Odebrano zlecenie transportu półki " + QString::number(npolki)+ " na stanowisko "  + QString::number(nstanowiska)+ ".";
+
+    WyslijLogi(log);
 
     //stan[polki[npolki].polorzenie_bazowe.Y][polki[npolki].polorzenie_bazowe.X] = nstanowiska;
+}
+
+void sterownik::OdbierzZegar(int a, int b)
+{
+    t=a;
+    dt=b;
+}
+
+
+double sterownik::time() // zwraca aktualny czas symulacji
+{
+    return  (double)t * (double)dt / 1000;
 }

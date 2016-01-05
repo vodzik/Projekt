@@ -11,6 +11,8 @@ class Smith :public QThread
     Q_OBJECT
 
 public:
+    int dt;
+    int t;
     Smith(QThread *parent);
     void run();
     int smithy[20];
@@ -19,6 +21,7 @@ public:
 
 signals:
     void sygnal(int);  //sygnal który wybywa
+    void clock(int,int);
 };
 
 #endif // SMITH_H

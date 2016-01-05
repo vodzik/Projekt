@@ -5,6 +5,8 @@
 
 Smith::Smith(QThread *parent)
 {
+    dt=10;
+    t=0;
     qsrand(QTime::currentTime().msec()); // inicjalizacja ciągu pseudolosowego;
     for(int i=0; i<20; i++)
     {
@@ -15,17 +17,16 @@ Smith::Smith(QThread *parent)
 void Smith::run()
 {
     //tutaj piszę WSZYSTKO!!!! (co mam tu pisać)
-
     while(1)
     {
         for(int i=0; i<20; i++)
             if(smithy[i]>0)
                 smithy[i]= smithy[i]-1;
-        this->msleep(1);  //czekanie 200 ms
-        for(int i=0; i<20; i++)
-            if(smithy[i]==0)
-                emit sygnal(i);
-        }
+        this->msleep(dt);  //czekanie 1 ms
+        t++;
+        for(int i=0; i<20; i++) if(smithy[i]==0) emit sygnal(i);
+        emit clock(t,dt);
+    }
 }
 
 void Smith::slot(int id_robota)
