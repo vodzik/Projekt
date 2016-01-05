@@ -7,4 +7,4 @@ int Robot::get_id() { return id; }
 
 int Robot::get_shelf() { return polka; }
 
-bool Robot::set_shelf(int s) { polka = s; }
+bool Robot::set_shelf(int s) { polka = s; return true;}
