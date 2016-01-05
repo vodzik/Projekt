@@ -3,6 +3,7 @@
 
 #include <list>
 #include "coordinates.h"
+
 using namespace std;
 
 class zadanie
@@ -15,6 +16,8 @@ public:
     int numerStanowiska;
     coordinates wpolrzednePolki;
     coordinates wspolrzedneStanowska;
+
+    void GenerujScierzke();
 
     list<coordinates> krok;
 };

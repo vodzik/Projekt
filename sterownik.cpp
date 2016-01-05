@@ -78,8 +78,10 @@ void sterownik::InicjalizujMacierzStanu()
     for(i=0;i<21;i++)
     {
         stan[i]=new int[26];
+        mapa[i]=new int[26];
     }
 }
+
 
 /* zwraca adres stanowiska */
 coordinates sterownik::AdresStanowsika(int s)
@@ -104,11 +106,19 @@ void sterownik::OdbierzZadanie(int npolki, int nstanowiska)
 {
     zadanie * z1;
     coordinates p, s;
+
+    // pobranie danych do zadania
     p.X = polki[npolki].polorzenie_bazowe.X;
     p.Y = polki[npolki].polorzenie_bazowe.Y;
     s = AdresStanowsika(nstanowiska);
 
+    // stworzenie zadania w wersji z podziałem na kroki
     z1 = new zadanie(npolki,nstanowiska, p, s);
+    z1->GenerujScierzke();
+
+    // wrzucenie zadania na listę
+    listaZadan.push_back(z1);
+
 
 
     //stan[polki[npolki].polorzenie_bazowe.Y][polki[npolki].polorzenie_bazowe.X] = nstanowiska;

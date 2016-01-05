@@ -10,4 +10,5 @@ public:
     int Y;
 };
 
+
 #endif // COORDINATES_H
