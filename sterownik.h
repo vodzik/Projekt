@@ -6,17 +6,15 @@
 #include <QThread>
 #include <QtCore>
 #include <QDebug>
-#include <list>
 #include "shelf.h"
-#include "zadanie.h"
-
+#include "smith.h"
 
 class sterownik : public QThread
 {
     Q_OBJECT
 public:
     sterownik(QWidget *parent);  //konstruktor sterownika
-
+    Smith *agent;
     shelf *polki;    //wektor polek
 
     int iloscpolek; //dlogosc wektora polek
@@ -24,10 +22,6 @@ public:
     void run(); //glowna petla watku
 
     int **stan;  //macierz stanu przesylana do wizualizacji;
-
-    int ** mapa; // zmienna będzie zawierała mapę obszaru
-                 // mapa jest wykorzystywana przy zdefiniowaniu listy kroków potrzebnych do wykonania zadania
-    std::list<zadanie> listaZadan;
 
 signals:
     void Wyslijstan(int**);  //sygnal wysylajacy stan do wizualizacji
