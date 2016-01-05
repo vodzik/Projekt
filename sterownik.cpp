@@ -16,7 +16,7 @@ void sterownik::run()
 {
     while(1)
     {
-        //OdswierzMacierzStanu();
+        OdswierzMacierzStanu();
         emit Wyslijstan(stan);
         this->msleep(200);
     }
