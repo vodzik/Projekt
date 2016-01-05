@@ -51,7 +51,7 @@ void sterownik::InicjalizujWektorPolek()
 /* aktualizuje macierz stanu tablicy */
 /* póki co wpisuje tylko które pola są zajęte przez pólkę */
 /* TODO: trzeba też uwzględnić pozostałe możliwe stany */
-/* najlepiej będzie aktualizować poszczególne pola w momencie kiedy będą rozpatrywane ruchy i przydzielanie zasobów */
+/* TODO2: najlepiej będzie aktualizować poszczególne pola w momencie kiedy będą rozpatrywane ruchy i przydzielanie zasobów */
 void sterownik::OdswierzMacierzStanu()
 {
     int i,j;
@@ -68,16 +68,22 @@ void sterownik::OdswierzMacierzStanu()
     }
 }
 
+/* inicjalizuje macierz stanu o sztywno zdefioniownych wymiarach */
+/* dokładniej tworzy pustą macierz */
+/* dodatkowo stworzy mapę obszaru */
 void sterownik::InicjalizujMacierzStanu()
 {
     int i;
     stan=new int*[21];
+    mapa = new int * [21];
     for(i=0;i<21;i++)
     {
         stan[i]=new int[26];
     }
 }
 
+/* slot służy do odebrania zadania z wątku w którym działa interfejs */
+/* w slocie wywoływana jest funkcja dodająca nowe zadanie */
 void sterownik::OdbierzZadanie(int npolki, int nstanowiska)
 {
     stan[polki[npolki].polorzenie_bazowe.Y][polki[npolki].polorzenie_bazowe.X] = nstanowiska;
