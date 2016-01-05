@@ -102,5 +102,14 @@ coordinates sterownik::AdresStanowsika(int s)
 /* w slocie wywoływana jest funkcja dodająca nowe zadanie */
 void sterownik::OdbierzZadanie(int npolki, int nstanowiska)
 {
-    stan[polki[npolki].polorzenie_bazowe.Y][polki[npolki].polorzenie_bazowe.X] = nstanowiska;
+    zadanie * z1;
+    coordinates p, s;
+    p.X = polki[npolki].polorzenie_bazowe.X;
+    p.Y = polki[npolki].polorzenie_bazowe.Y;
+    s = AdresStanowsika(nstanowiska);
+
+    z1 = new zadanie(npolki,nstanowiska, p, s);
+
+
+    //stan[polki[npolki].polorzenie_bazowe.Y][polki[npolki].polorzenie_bazowe.X] = nstanowiska;
 }

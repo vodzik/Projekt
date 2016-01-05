@@ -8,7 +8,7 @@ using namespace std;
 class zadanie
 {
 public:
-    zadanie(int, int, coordinates, coordinates);
+    zadanie(int p, int s, coordinates pxy, coordinates sxy);
 
     int liczbaKrokow;
     int numerPolki;
