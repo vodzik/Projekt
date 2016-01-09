@@ -20,7 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
     qsrand(QTime::currentTime().msec()); // inicjalizacja ciągu pseudolosowego;
 
     refreash = new refreasher(this);  //twoezenie instancji wątku zegara odświerzania
-    connect(refreash,SIGNAL(Tick()),this,SLOT(onTick())); //łaczenie sygnału odświeżania Tick() ze slotem onTick()
+   // connect(refreash,SIGNAL(Tick()),this,SLOT(onTick())); //łaczenie sygnału odświeżania Tick() ze slotem onTick()
+
     refreash->start();  //start wątku
 
 
@@ -28,6 +29,9 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
     connect(driver,SIGNAL(Wyslijstan(int**,double)),this,SLOT(Odbierzstan(int**,double))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
     connect(driver,SIGNAL(WyslijLogi(QString)),this,SLOT(OdbierzLogi(QString))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
     connect(this,SIGNAL(WyslijZadanie(int,int)),driver,SLOT(OdbierzZadanie(int,int))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
+    connect(driver,SIGNAL(WyslijZadania(QString)),this,SLOT(OdbierzListeZadan(QString)));
+    connect(refreash,SIGNAL(Tick()),driver,SLOT(OdbierzRefreshera())); //łaczenie sygnału odświeżania Tick() ze slotem OdbierzRefreshera w driverze
+
     driver->start();  //start wątku
 
     logi="Start";
@@ -58,6 +62,7 @@ void MainWindow::Odbierzstan(int **stana, double time) //obsługa sygnału Odbie
             stan[i][j]=stana[i][j];
         }
     }
+    rysuj();
 }
 
 void MainWindow::rysuj()  //funkcja rysująca

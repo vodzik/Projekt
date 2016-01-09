@@ -3,6 +3,7 @@
 /* konstruktor klasy */
 sterownik::sterownik(QWidget *parent)
 {
+
     iloscpolek=240;
     InicjalizujWektorPolek();
     InicjalizujMacierzStanu();
@@ -10,6 +11,9 @@ sterownik::sterownik(QWidget *parent)
     agent = new Smith (this);
     connect(agent,SIGNAL(clock(int,int)),this,SLOT(OdbierzZegar(int,int)));
     agent->start();
+    InicjujMacierzZadan();
+    InicjujStanRobotow();
+
 }
 
 /* "główna" funkcja wykonująca się w wątku sterownika */
@@ -19,9 +23,114 @@ void sterownik::run()
     while(1)
     {
         OdswierzMacierzStanu();
-        emit Wyslijstan(stan,time());
-        this->msleep(200);
+        ObslurzZadania1();
+        //this->msleep(10);
+
     }
+}
+
+
+void sterownik::ObslurzZadania1()
+{
+    int i=0;
+    int j=0;
+    QString Logi;
+    Mutex_zadania.lock();
+    while(i<100&&tablicazadan[i].stan!=0)
+    {
+       if((i<100&&tablicazadan[i].stan==1)&&(stan[15][25]==0)&&(licznikzadanaktywnych<20))
+       {
+       while(RobotZajety[j])j++;
+       tablicazadan[i].id_robota=j;
+       RobotZajety[j]=1;
+       tablicazadan[i].stan=2;
+       tablicRobotow[j].X=25;
+       tablicRobotow[j].Y=15;
+       Logi=QString::number(time(),'g',6)+"s";
+       Logi+=" Robot nr. "+ QString::number(j)+" otrzymał zadanie nr. "+QString::number(tablicazadan[i].id_wyswietlane)+ " i wszedł do systemu" ;
+       WyslijLogi(Logi);
+       WyslijZadania();
+       i=100;
+       }
+       i++;
+    }
+    Mutex_zadania.unlock();
+
+}
+
+
+
+
+
+
+
+
+
+
+void sterownik::InicjujStanRobotow()
+{
+    int i;
+    for(i=0;i<20;i++)
+    {
+        RobotZajety[i]=0;
+    }
+}
+
+
+
+void sterownik::InicjujMacierzZadan()
+{
+    Mutex_zadania.lock();
+    int i;
+    for(i=0;i<100;i++)
+    {
+        tablicazadan[i].stan=0;
+        tablicazadan[i].numerPolki=0;
+        tablicazadan[i].numerStanowiska=0;
+        tablicazadan[i].id_wyswietlane=0;
+    }
+    licznikzadan=0;
+    licznikzadanaktywnych=0;
+    WyslijZadania();
+    Mutex_zadania.unlock();
+}
+
+bool sterownik::DodajZadanie(int nrPolki, int nrStanowiska)
+{
+    Mutex_zadania.lock();
+    int i=0;
+    while(i<100&&tablicazadan[i].stan!=0) i++;
+    if (i==100)
+    {
+        Mutex_zadania.unlock();
+        return 1;
+    }
+    licznikzadan++;
+    tablicazadan[i].stan=1;
+    tablicazadan[i].numerPolki=nrPolki;
+    tablicazadan[i].numerStanowiska=nrStanowiska;
+    tablicazadan[i].id_wyswietlane=licznikzadan;
+    WyslijZadania();
+    Mutex_zadania.unlock();
+    return 0;
+}
+
+
+void sterownik::UsunZadanie(int real_id)
+{
+    Mutex_zadania.lock();
+    int i=real_id;
+    while(i<99)
+    {
+        tablicazadan[i].id_wyswietlane=tablicazadan[i+1].id_wyswietlane;
+        tablicazadan[i].numerPolki=tablicazadan[i+1].numerPolki;
+        tablicazadan[i].numerStanowiska=tablicazadan[i+1].numerStanowiska;
+       tablicazadan[i].stan=tablicazadan[i+1].stan;
+        i++;
+    }
+    tablicazadan[i].stan=0;
+    WyslijZadania();
+    Mutex_zadania.unlock();
 }
 
 /* inicjalizacja wektora półek */
@@ -56,6 +165,7 @@ void sterownik::InicjalizujWektorPolek()
 /* TODO2: najlepiej będzie aktualizować poszczególne pola w momencie kiedy będą rozpatrywane ruchy i przydzielanie zasobów */
 void sterownik::OdswierzMacierzStanu()
 {
+    Mutex_stan.lock();
     int i,j;
     for(i=0;i<21;i++)
     {
@@ -68,6 +178,25 @@ void sterownik::OdswierzMacierzStanu()
     {
         stan[polki[i].polorzenie_aktualne.Y][polki[i].polorzenie_aktualne.X]=2;
     }
+    Mutex_zadania.lock();
+    i=0;
+    while(i<100&&tablicazadan[i].stan!=0)
+    {
+        if(tablicazadan[i].stan==2||tablicazadan[i].stan==5)
+        {
+
+            coordinates temp;
+            temp.X=tablicRobotow[tablicazadan[i].id_robota].X;
+            temp.Y=tablicRobotow[tablicazadan[i].id_robota].Y;
+            stan[temp.Y][temp.X]=3;
+
+        }
+        i++;
+    }
+
+
+    Mutex_zadania.unlock();
+   Mutex_stan.unlock();
 }
 
 /* inicjalizuje macierz stanu o sztywno zdefioniownych wymiarach */
@@ -107,29 +236,13 @@ coordinates sterownik::AdresStanowsika(int s)
 /* w slocie wywoływana jest funkcja dodająca nowe zadanie */
 void sterownik::OdbierzZadanie(int npolki, int nstanowiska)
 {
-    zadanie * z1;
-    coordinates p, s;
-
-    // pobranie danych do zadania
-    p.X = polki[npolki].polorzenie_bazowe.X;
-    p.Y = polki[npolki].polorzenie_bazowe.Y;
-    s = AdresStanowsika(nstanowiska);
-
-    // stworzenie zadania w wersji z podziałem na kroki
-    z1 = new zadanie(npolki,nstanowiska, p, s);
-    z1->GenerujScierzke();
-
-    // wrzucenie zadania na listę
-    listaZadan.push_back(z1);
 
     QString log;
-
     log = QString::number(time(),'g',6);
-    log=log + "s Odebrano zlecenie transportu półki " + QString::number(npolki)+ " na stanowisko "  + QString::number(nstanowiska)+ ".";
-
-    WyslijLogi(log);
-
-    //stan[polki[npolki].polorzenie_bazowe.Y][polki[npolki].polorzenie_bazowe.X] = nstanowiska;
+    // wrzucenie zadania na listę
+    if(DodajZadanie(npolki,nstanowiska)==0)log=log + "s Dodano zadanie transportu polki " + QString::number(npolki)+ " na stanowisko "  + QString::number(nstanowiska)+ ". Id="+QString::number(licznikzadan);
+    else log=log+ "s Zadanie pominiente. Przekroczono limit ilości zadań";
+    emit WyslijLogi(log);
 }
 
 void sterownik::OdbierzZegar(int a, int b)
@@ -142,4 +255,32 @@ void sterownik::OdbierzZegar(int a, int b)
 double sterownik::time() // zwraca aktualny czas symulacji
 {
     return  (double)t * (double)dt / 1000;
+}
+
+void sterownik::WyslijZadania()
+{
+
+    QString zadania="";
+    int i=0;
+    while(i<100&&tablicazadan[i].stan!=0)
+    {
+        zadania+="id_zadania="+QString::number(tablicazadan[i].id_wyswietlane)+" numer_półki="+QString::number(tablicazadan[i].numerPolki)+" numer_stanowiska="+QString::number(tablicazadan[i].numerStanowiska)+" status=";
+        if(tablicazadan[i].stan==1) zadania+="Oczekujące";
+        if(tablicazadan[i].stan==2) zadania+="Wysłane po półkę";
+        if(tablicazadan[i].stan==3) zadania+="Wysłane do przeładunku";
+        if(tablicazadan[i].stan==4) zadania+="Powrut półki";
+        if(tablicazadan[i].stan==5) zadania+="Powrut robota";
+        zadania+='\n';
+
+        i++;
+    }
+emit WyslijZadania(zadania);
+}
+
+
+void sterownik::OdbierzRefreshera()
+{
+Mutex_stan.lock();
+    emit Wyslijstan(stan,time());
+Mutex_stan.unlock();
 }
