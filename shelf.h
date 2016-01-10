@@ -8,6 +8,7 @@ public:
     int id;
     coordinates polorzenie_aktualne;
     coordinates polorzenie_bazowe;
+    bool zarezerwowana;
     shelf();
 
     bool CzyNaMiejscu();

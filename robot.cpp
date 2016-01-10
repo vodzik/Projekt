@@ -6,6 +6,8 @@ Robot::Robot()
     rezerwacja_2.active=0;
     polorzenie.active=0;
     pracuje=0;
+    przeladunek=0;
+    zaladowany=0;
 
 }
 

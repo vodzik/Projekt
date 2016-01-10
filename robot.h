@@ -13,6 +13,8 @@ coordinates polorzenie;
 coordinates rezerwacja_1;
 coordinates rezerwacja_2;
 bool pracuje;
+bool przeladunek;
+bool zaladowany;
 Robot();
 
 void replace();

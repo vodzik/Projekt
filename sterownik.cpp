@@ -27,7 +27,7 @@ void sterownik::run()
 
         OdswierzMacierzStanu();
         ObslurzZadania1();
-        OdswierzMacierzStanu();
+       // OdswierzMacierzStanu();
         ObslurzZadania2();
 
 
@@ -45,22 +45,26 @@ void sterownik::ObslurzZadania1()
     Mutex_stan.lock();
     while(i<100&&tablicazadan[i].stan!=0)
     {
-       if((i<100&&tablicazadan[i].stan==1)&&(stan[15][25]==0)&&(licznikzadanaktywnych<20))
+       if((i<100&&tablicazadan[i].stan==1)&&(stan[15][25]==0)&&(licznikzadanaktywnych<20)&&(polki[tablicazadan[i].numerPolki].zarezerwowana==0))
        {
+       polki[tablicazadan[i].numerPolki].zarezerwowana=1;
        while(Roboty[j].polorzenie.active)j++;
        tablicazadan[i].id_robota=j;
        Roboty[j].polorzenie.active=1;
        tablicazadan[i].stan=2;
        Roboty[j].polorzenie.X=25;
        Roboty[j].polorzenie.Y=15;
+       Roboty[j].przeladunek=0;
+       Roboty[j].zaladowany=0;
        stan[15][25]=3;
+       licznikzadanaktywnych++;
        Logi=QString::number(time(),'g',6)+"s";
        Logi+=" Robot nr. "+ QString::number(j)+" otrzymał zadanie nr. "+QString::number(tablicazadan[i].id_wyswietlane)+ " i wszedł do systemu" ;
        WyslijLogi(Logi);
        WyslijZadania();
        i=100;
        }
-       i++;
+    i++;
     }
     Mutex_stan.unlock();
     Mutex_zadania.unlock();
@@ -82,55 +86,77 @@ void sterownik::ObslurzZadania2()
     {
        if((i<100&&tablicazadan[i].stan==2))
        {
+
            j=tablicazadan[i].id_robota;
-           if(Roboty[j].canorder())
+           temp.active=0;
+           temp.X=0;
+           temp.Y=0;
+           nr_polki=tablicazadan[i].numerPolki;
+           if(Roboty[j].zaladowany==0)
            {
-
-               temp.active=0;
-               temp.X=0;
-               temp.Y=0;
-               nr_polki=tablicazadan[i].numerPolki;
-               //if pierwsza prosta
-               if(temp.active==0&&Roboty[j].najdalszy_zaplanowany().X==25&&Roboty[j].najdalszy_zaplanowany().Y>polki[nr_polki].AlejkaBazowa())
+               if(Roboty[j].canorder())
                {
-                   temp.X=25;
-                   temp.Y=Roboty[j].najdalszy_zaplanowany().Y-1;
-                   temp.active=1;
+
+
+                   //if pierwsza prosta
+                   if(temp.active==0&&Roboty[j].najdalszy_zaplanowany().X==25&&Roboty[j].najdalszy_zaplanowany().Y>polki[nr_polki].AlejkaBazowa())
+                   {
+                       temp.X=25;
+                       temp.Y=Roboty[j].najdalszy_zaplanowany().Y-1;
+                       temp.active=1;
+
+                   }
+
+                   //if droga prosta
+                   if(temp.active==0&&Roboty[j].najdalszy_zaplanowany().X>polki[nr_polki].polorzenie_bazowe.X&&Roboty[j].najdalszy_zaplanowany().Y==polki[nr_polki].AlejkaBazowa())
+                   {
+                       temp.X=Roboty[j].najdalszy_zaplanowany().X-1;
+                       temp.Y=Roboty[j].najdalszy_zaplanowany().Y;
+                       temp.active=1;
+                   }
+
+
+                   //if zjazd po polke
+                   if(temp.active==0&&Roboty[j].najdalszy_zaplanowany().X==polki[nr_polki].polorzenie_bazowe.X&&Roboty[j].najdalszy_zaplanowany().Y==polki[nr_polki].AlejkaBazowa())
+                   {
+                       temp.X=Roboty[j].najdalszy_zaplanowany().X;
+                       temp.Y=polki[nr_polki].polorzenie_bazowe.Y;
+                       temp.active=1;
+                   }
+
+
+                   if((stan[temp.Y][temp.X]==0||stan[temp.Y][temp.X]==2)&&(temp.active==1))
+                   {
+                       Roboty[j].addorder(temp);
+                       stan[temp.Y][temp.X]=1;
+                   }
+
 
                }
 
-               //if droga prosta
-               if(temp.active==0&&Roboty[j].najdalszy_zaplanowany().X>polki[nr_polki].polorzenie_bazowe.X&&Roboty[j].najdalszy_zaplanowany().Y==polki[nr_polki].AlejkaBazowa())
-               {
-                   temp.X=Roboty[j].najdalszy_zaplanowany().X-1;
-                   temp.Y=Roboty[j].najdalszy_zaplanowany().Y;
-                   temp.active=1;
-               }
 
 
-               //if zjazd po polke
-               if(temp.active==0&&Roboty[j].najdalszy_zaplanowany().X==polki[nr_polki].polorzenie_bazowe.X&&Roboty[j].najdalszy_zaplanowany().Y==polki[nr_polki].AlejkaBazowa())
-               {
-                   temp.X=Roboty[j].najdalszy_zaplanowany().X;
-                   temp.Y=polki[nr_polki].polorzenie_bazowe.Y;
-                   temp.active=1;
-               }
+               if(Roboty[j].polorzenie.X==polki[nr_polki].polorzenie_bazowe.X&&Roboty[j].polorzenie.Y==polki[nr_polki].polorzenie_bazowe.Y&&Roboty[j].pracuje==0)
+                {
+                Roboty[j].pracuje=1;
+                Roboty[j].przeladunek=1;
+                emit polecenie_dla_agenta(j);
 
-
-               if((stan[temp.Y][temp.X]==0||stan[temp.Y][temp.X]==2)&&(temp.active==1))
-               {
-                   Roboty[j].addorder(temp);
-                   stan[temp.Y][temp.X]=1;
-               }
-
+                }
+               else if(Roboty[j].cango())
+                {
+                Roboty[j].pracuje=1;
+                emit polecenie_dla_agenta(j);
+                }
 
            }
 
-       if(Roboty[j].cango())
-            {
-            Roboty[j].pracuje=1;
-            emit polecenie_dla_agenta(j);
-            }
+           else
+           {
+               tablicazadan[i].stan=3;
+
+           }
+
        }
 
     i++;
@@ -233,6 +259,7 @@ void sterownik::InicjalizujWektorPolek()
         polki[i].polorzenie_aktualne.X=x;
         polki[i].polorzenie_aktualne.Y=y;
         polki[i].id=i;
+        polki[i].zarezerwowana=0;
         x++;
         if(x==25)
         {
@@ -273,7 +300,18 @@ void sterownik::OdswierzMacierzStanu()
 
             temp.X=Roboty[tablicazadan[i].id_robota].polorzenie.X;
             temp.Y=Roboty[tablicazadan[i].id_robota].polorzenie.Y;
-            stan[temp.Y][temp.X]=3;
+            if(stan[temp.Y][temp.X]==2) stan[temp.Y][temp.X] =4;
+            else  stan[temp.Y][temp.X]=3;
+
+        }
+
+        if(tablicazadan[i].stan==3||tablicazadan[i].stan==4)
+        {
+
+
+            temp.X=Roboty[tablicazadan[i].id_robota].polorzenie.X;
+            temp.Y=Roboty[tablicazadan[i].id_robota].polorzenie.Y;
+            stan[temp.Y][temp.X] =5;
 
         }
         i++;
@@ -392,10 +430,22 @@ void sterownik::sygnal_od_agenta(int id)
 {
 
 
-    Mutex_zadania.lock();
-    Roboty[id].replace();
-    Roboty[id].pracuje=0;
-    Mutex_zadania.unlock();
+
+    Mutex_stan.lock();
+
+    if(Roboty[id].przeladunek)
+    {
+        Roboty[id].przeladunek=0;
+        Roboty[id].pracuje=0;
+        Roboty[id].zaladowany=~Roboty[id].zaladowany;
+    }
+    else
+    {
+        Roboty[id].replace();
+        Roboty[id].pracuje=0;
+    }
+
+    Mutex_stan.unlock();
 
 
 

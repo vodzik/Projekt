@@ -3,7 +3,7 @@
 
 Smith::Smith(QThread *parent)
 {
-    dt=10;
+    dt=5;
     t=0;
     qsrand(QTime::currentTime().msec()); // inicjalizacja ciągu pseudolosowego;
     for(int i=0; i<20; i++)
@@ -36,9 +36,9 @@ void Smith::slot1(int id_robota)
 {
     Mutex_time.lock();
     if(qrand()%2==0)
-        smithy[id_robota]=(50+(qrand()%10));
+        smithy[id_robota]=(100+(qrand()%10));
     else
-        smithy[id_robota]=(50-(qrand()%10));
+        smithy[id_robota]=(100-(qrand()%10));
     Mutex_time.unlock();
 
 }
