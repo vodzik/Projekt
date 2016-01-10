@@ -10,6 +10,8 @@ sterownik::sterownik(QWidget *parent)
     OdswierzMacierzStanu();
     agent = new Smith (this);
     connect(agent,SIGNAL(clock(int,int)),this,SLOT(OdbierzZegar(int,int)));
+    connect(this,SIGNAL(polecenie_dla_agenta(int)),agent,SLOT(slot1(int)));
+    connect(agent,SIGNAL(sygnal1(int)),this,SLOT(sygnal_od_agenta(int)));
     agent->start();
     InicjujMacierzZadan();
     InicjujStanRobotow();
@@ -22,9 +24,13 @@ void sterownik::run()
 {
     while(1)
     {
+
         OdswierzMacierzStanu();
         ObslurzZadania1();
-        //this->msleep(10);
+        OdswierzMacierzStanu();
+        ObslurzZadania2();
+
+
 
     }
 }
@@ -36,16 +42,18 @@ void sterownik::ObslurzZadania1()
     int j=0;
     QString Logi;
     Mutex_zadania.lock();
+    Mutex_stan.lock();
     while(i<100&&tablicazadan[i].stan!=0)
     {
        if((i<100&&tablicazadan[i].stan==1)&&(stan[15][25]==0)&&(licznikzadanaktywnych<20))
        {
-       while(RobotZajety[j])j++;
+       while(Roboty[j].polorzenie.active)j++;
        tablicazadan[i].id_robota=j;
-       RobotZajety[j]=1;
+       Roboty[j].polorzenie.active=1;
        tablicazadan[i].stan=2;
-       tablicRobotow[j].X=25;
-       tablicRobotow[j].Y=15;
+       Roboty[j].polorzenie.X=25;
+       Roboty[j].polorzenie.Y=15;
+       stan[15][25]=3;
        Logi=QString::number(time(),'g',6)+"s";
        Logi+=" Robot nr. "+ QString::number(j)+" otrzymał zadanie nr. "+QString::number(tablicazadan[i].id_wyswietlane)+ " i wszedł do systemu" ;
        WyslijLogi(Logi);
@@ -54,10 +62,83 @@ void sterownik::ObslurzZadania1()
        }
        i++;
     }
+    Mutex_stan.unlock();
     Mutex_zadania.unlock();
 
 }
 
+
+void sterownik::ObslurzZadania2()
+{
+    int i=0;
+    int j=0;
+
+    QString Logi;
+    coordinates temp;
+    int nr_polki;
+    Mutex_zadania.lock();
+    Mutex_stan.lock();
+    while(i<100&&tablicazadan[i].stan!=0)
+    {
+       if((i<100&&tablicazadan[i].stan==2))
+       {
+           j=tablicazadan[i].id_robota;
+           if(Roboty[j].canorder())
+           {
+
+               temp.active=0;
+               temp.X=0;
+               temp.Y=0;
+               nr_polki=tablicazadan[i].numerPolki;
+               //if pierwsza prosta
+               if(temp.active==0&&Roboty[j].najdalszy_zaplanowany().X==25&&Roboty[j].najdalszy_zaplanowany().Y>polki[nr_polki].AlejkaBazowa())
+               {
+                   temp.X=25;
+                   temp.Y=Roboty[j].najdalszy_zaplanowany().Y-1;
+                   temp.active=1;
+
+               }
+
+               //if droga prosta
+               if(temp.active==0&&Roboty[j].najdalszy_zaplanowany().X>polki[nr_polki].polorzenie_bazowe.X&&Roboty[j].najdalszy_zaplanowany().Y==polki[nr_polki].AlejkaBazowa())
+               {
+                   temp.X=Roboty[j].najdalszy_zaplanowany().X-1;
+                   temp.Y=Roboty[j].najdalszy_zaplanowany().Y;
+                   temp.active=1;
+               }
+
+
+               //if zjazd po polke
+               if(temp.active==0&&Roboty[j].najdalszy_zaplanowany().X==polki[nr_polki].polorzenie_bazowe.X&&Roboty[j].najdalszy_zaplanowany().Y==polki[nr_polki].AlejkaBazowa())
+               {
+                   temp.X=Roboty[j].najdalszy_zaplanowany().X;
+                   temp.Y=polki[nr_polki].polorzenie_bazowe.Y;
+                   temp.active=1;
+               }
+
+
+               if((stan[temp.Y][temp.X]==0||stan[temp.Y][temp.X]==2)&&(temp.active==1))
+               {
+                   Roboty[j].addorder(temp);
+                   stan[temp.Y][temp.X]=1;
+               }
+
+
+           }
+
+       if(Roboty[j].cango())
+            {
+            Roboty[j].pracuje=1;
+            emit polecenie_dla_agenta(j);
+            }
+       }
+
+    i++;
+    }
+    Mutex_stan.unlock();
+    Mutex_zadania.unlock();
+
+}
 
 
 
@@ -72,7 +153,10 @@ void sterownik::InicjujStanRobotow()
     int i;
     for(i=0;i<20;i++)
     {
-        RobotZajety[i]=0;
+        Roboty[i].polorzenie.active=0;
+        Roboty[i].rezerwacja_1.active=0;
+        Roboty[i].rezerwacja_2.active=0;
+        Roboty[i].pracuje=0;
     }
 }
 
@@ -165,6 +249,7 @@ void sterownik::InicjalizujWektorPolek()
 /* TODO2: najlepiej będzie aktualizować poszczególne pola w momencie kiedy będą rozpatrywane ruchy i przydzielanie zasobów */
 void sterownik::OdswierzMacierzStanu()
 {
+    coordinates temp;
     Mutex_stan.lock();
     int i,j;
     for(i=0;i<21;i++)
@@ -185,15 +270,33 @@ void sterownik::OdswierzMacierzStanu()
         if(tablicazadan[i].stan==2||tablicazadan[i].stan==5)
         {
 
-            coordinates temp;
-            temp.X=tablicRobotow[tablicazadan[i].id_robota].X;
-            temp.Y=tablicRobotow[tablicazadan[i].id_robota].Y;
+
+            temp.X=Roboty[tablicazadan[i].id_robota].polorzenie.X;
+            temp.Y=Roboty[tablicazadan[i].id_robota].polorzenie.Y;
             stan[temp.Y][temp.X]=3;
 
         }
         i++;
     }
 
+    for(i=0;i<20;i++)
+    {
+        if(Roboty[i].polorzenie.active)
+        {
+            if(Roboty[i].rezerwacja_1.active)
+            {
+                temp.X=Roboty[i].rezerwacja_1.X;
+                temp.Y=Roboty[i].rezerwacja_1.Y;
+                stan[temp.Y][temp.X]=1;
+                if(Roboty[i].rezerwacja_2.active)
+                {
+                    temp.X=Roboty[i].rezerwacja_2.X;
+                    temp.Y=Roboty[i].rezerwacja_2.Y;
+                    stan[temp.Y][temp.X]=1;
+                }
+            }
+        }
+    }
 
     Mutex_zadania.unlock();
    Mutex_stan.unlock();
@@ -284,3 +387,18 @@ Mutex_stan.lock();
     emit Wyslijstan(stan,time());
 Mutex_stan.unlock();
 }
+
+void sterownik::sygnal_od_agenta(int id)
+{
+
+
+    Mutex_zadania.lock();
+    Roboty[id].replace();
+    Roboty[id].pracuje=0;
+    Mutex_zadania.unlock();
+
+
+
+
+}
+

@@ -30,8 +30,8 @@ public:
 
     //std::vector<Robot> robo_vector; // wektor zawiera roboty w systemie
 
-    coordinates tablicRobotow[20];
-    bool RobotZajety[20];
+    Robot Roboty[20];
+
 
     int t;
 
@@ -57,11 +57,14 @@ signals:
     void Wyslijstan(int**, double);  //sygnal wysylajacy stan do wizualizacji
     void WyslijLogi(QString);  //wysłanie logów
     void WyslijZadania(QString); //wysyła liste wszystkich zadań
+    void polecenie_dla_agenta(int);
+
 
 public slots:
     void OdbierzZadanie(int, int);  // pierwszy int - półka, drugi int - stanowisko
     void OdbierzZegar(int, int);  // t,dt
     void OdbierzRefreshera();
+    void sygnal_od_agenta(int);
 
 private:
     QMutex Mutex_stan;

@@ -8,6 +8,7 @@ public:
     coordinates();
     int X;
     int Y;
+    bool active;
 };
 
 
