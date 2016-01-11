@@ -8,6 +8,28 @@ Robot::Robot()
     pracuje=0;
     przeladunek=0;
     zaladowany=0;
+    id_polki=0;
+    przetwarzanie=0;
+    przetworzone=0;
+    usuwanie=0;
+    usun=0;
+
+}
+
+
+void Robot::clear()
+{
+    rezerwacja_1.active=0;
+    rezerwacja_2.active=0;
+    polorzenie.active=0;
+    pracuje=0;
+    przeladunek=0;
+    zaladowany=0;
+    id_polki=0;
+    przetwarzanie=0;
+    przetworzone=0;
+    usuwanie=0;
+    usun=0;
 
 }
 

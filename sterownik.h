@@ -84,6 +84,7 @@ private:
     void ObslurzZadania3();
     void ObslurzZadania4();
     void ObslurzZadania5();
+    void ObslurzUsuwanie();
 };
 
 #endif // STEROWNIK_H

@@ -15,8 +15,15 @@ coordinates rezerwacja_2;
 bool pracuje;
 bool przeladunek;
 bool zaladowany;
+bool przetwarzanie;
+bool przetworzone;
+bool usuwanie;
+bool usun;
+int id_polki;
 Robot();
 
+
+void clear();
 void replace();
 coordinates najdalszy_zaplanowany();
 bool canorder();

@@ -36,9 +36,9 @@ void Smith::slot1(int id_robota)
 {
     Mutex_time.lock();
     if(qrand()%2==0)
-        smithy[id_robota]=(100+(qrand()%10));
+        smithy[id_robota]=(60+(qrand()%10));
     else
-        smithy[id_robota]=(100-(qrand()%10));
+        smithy[id_robota]=(60-(qrand()%10));
     Mutex_time.unlock();
 
 }
