@@ -45,35 +45,22 @@ void sterownik::ObslurzUsuwanie()
     Mutex_zadania.lock();
     Mutex_stan.lock();
 
-    int i=99;
-    while(tablicazadan[i].stan==0) i--;
+    int i;
 
-    while(i>=0)
-    {
-        i--;
-        if(tablicazadan[i].stan==6)
-        {
-            qDebug()<<"usuwanie "<< i;
 
-            Roboty[tablicazadan[i].id_robota].clear();
-            UsunZadanie(i);
-            licznikzadanaktywnych--;
-        }
-    }
-/*
     for(i=99;i>=0;i--)
     {
         if(tablicazadan[i].stan==6)
         {
-            qDebug()<<"usuwanie "<< i;
 
-            Roboty[tablicazadan[i].id_robota].clear();
+
+
             UsunZadanie(i);
             licznikzadanaktywnych--;
         }
     }
 
-    */
+
     Mutex_stan.unlock();
     Mutex_zadania.unlock();
 
@@ -621,6 +608,8 @@ bool sterownik::DodajZadanie(int nrPolki, int nrStanowiska)
 
 void sterownik::UsunZadanie(int real_id)
 {
+    Roboty[tablicazadan[real_id].id_robota].clear();
+    polki[tablicazadan[real_id].numerPolki].zarezerwowana=0;
 
     int i=real_id;
     while(i<98)
@@ -629,6 +618,7 @@ void sterownik::UsunZadanie(int real_id)
         tablicazadan[i].numerPolki=tablicazadan[i+1].numerPolki;
         tablicazadan[i].numerStanowiska=tablicazadan[i+1].numerStanowiska;
        tablicazadan[i].stan=tablicazadan[i+1].stan;
+       tablicazadan[i].id_robota=tablicazadan[i+1].id_robota;
         i++;
     }
     tablicazadan[i].stan=0;
