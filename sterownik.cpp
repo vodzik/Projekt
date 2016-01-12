@@ -4,6 +4,7 @@
 sterownik::sterownik(QWidget *parent)
 {
 
+    flaga_nowych_zadan=0;
     iloscpolek=240;
     InicjalizujWektorPolek();
     InicjalizujMacierzStanu();
@@ -33,6 +34,8 @@ void sterownik::run()
         ObslurzZadania3();
         ObslurzZadania2();
         ObslurzZadania1();
+        if(flaga_nowych_zadan)WyslijZadania();
+        flaga_nowych_zadan=0;
 
 
 
@@ -53,7 +56,7 @@ void sterownik::ObslurzUsuwanie()
         if(tablicazadan[i].stan==6)
         {
 
-
+            flaga_nowych_zadan=1;
 
             UsunZadanie(i);
             licznikzadanaktywnych--;
@@ -97,7 +100,8 @@ void sterownik::ObslurzZadania1()
        Logi=QString::number(time(),'g',6)+"s";
        Logi+=" Robot nr. "+ QString::number(j)+" otrzymał zadanie nr. "+QString::number(tablicazadan[i].id_wyswietlane)+ " i wszedł do systemu" ;
        WyslijLogi(Logi);
-       WyslijZadania();
+       //WyslijZadania();
+       flaga_nowych_zadan=1;
        i=100;
        }
     i++;
@@ -189,6 +193,7 @@ void sterownik::ObslurzZadania2()
 
            else
            {
+               flaga_nowych_zadan=1;
                tablicazadan[i].stan=3;
 
            }
@@ -319,6 +324,7 @@ void sterownik::ObslurzZadania3()
            else
            {
                tablicazadan[i].stan=4;
+               flaga_nowych_zadan=1;
 
            }
 
@@ -437,6 +443,7 @@ void sterownik::ObslurzZadania4()
            else
            {
                tablicazadan[i].stan=5;
+               flaga_nowych_zadan=1;
 
            }
 
@@ -536,6 +543,7 @@ void sterownik::ObslurzZadania5()
            else
            {
                tablicazadan[i].stan=6;
+               flaga_nowych_zadan=1;
 
            }
 
@@ -792,8 +800,8 @@ void sterownik::WyslijZadania()
         if(tablicazadan[i].stan==1) zadania+="Oczekujące";
         if(tablicazadan[i].stan==2) zadania+="Wysłane po półkę";
         if(tablicazadan[i].stan==3) zadania+="Wysłane do przeładunku";
-        if(tablicazadan[i].stan==4) zadania+="Powrut półki";
-        if(tablicazadan[i].stan==5) zadania+="Powrut robota";
+        if(tablicazadan[i].stan==4) zadania+="Powrót półki";
+        if(tablicazadan[i].stan==5) zadania+="Powrót robota";
         zadania+='\n';
 
         i++;

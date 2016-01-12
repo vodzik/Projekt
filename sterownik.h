@@ -32,6 +32,7 @@ public:
 
     Robot Roboty[20];
 
+    bool flaga_nowych_zadan;
 
     int t;
 
