@@ -6,9 +6,10 @@ class coordinates
 {
 public:
     coordinates();
-    int X;
-    int Y;
-    bool active;
+
+    int X;          //wspolrzedna X
+    int Y;          //wspolrzedna Y
+    bool active;    //dodatkowy znacznik informujący czy pozycja jest aktywna (w rużnych kontekstach)
 };
 
 

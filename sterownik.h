@@ -25,18 +25,18 @@ class sterownik : public QThread
 public:
     sterownik(QWidget *parent);  //konstruktor sterownika
 
-    Smith *agent;
+    Smith *agent;    //watek symulatora akcji
     shelf *polki;    //wektor polek
 
     //std::vector<Robot> robo_vector; // wektor zawiera roboty w systemie
 
     Robot Roboty[20];
 
-    bool flaga_nowych_zadan;
+    bool flaga_nowych_zadan;   //daje znać czy nalezy przesłać liste zadań do qui
 
-    int t;
+    int t;    //ilość iteracji czasu
 
-    int dt;
+    int dt;   //interwał czasu w ms
 
     int iloscpolek; //dlogosc wektora polek
 
@@ -47,45 +47,56 @@ public:
     int **mapa; // zmienna będzie zawierała mapę obszaru
                  // mapa jest wykorzystywana przy zdefiniowaniu listy kroków potrzebnych do wykonania zadania
 
-    zadanie tablicazadan[100];
+    zadanie tablicazadan[1000]; //tablica wszystkich zadan
 
-    int licznikzadan;
-    int licznikzadanaktywnych;
+    int licznikzadan;           //licznik zadan
+    int licznikzadanaktywnych;  //licznik zadan aktywnych
 
-    void WyslijZadania();
+    int czas_rochu;
+    int czas_zaladunku;
+    int czas_obslogi;
+    int czas_rozladunku;
+    int czas_wyjscia;
+
+    int kolejka[4]; //ilosc wozkow jadących do stanowisk
+
+
+    void WyslijZadania();       //metoda inicjująca sygnał z listą zadań wysyłany do gui
 
 signals:
     void Wyslijstan(int**, double);  //sygnal wysylajacy stan do wizualizacji
     void WyslijLogi(QString);  //wysłanie logów
     void WyslijZadania(QString); //wysyła liste wszystkich zadań
-    void polecenie_dla_agenta(int);
+    void polecenie_dla_agenta(int,int);  //wysyłanie polecenia do symulatora akcji dla agenta o podanym id i podanym średnim czasie akcji
 
 
 public slots:
     void OdbierzZadanie(int, int);  // pierwszy int - półka, drugi int - stanowisko
     void OdbierzZegar(int, int);  // t,dt
-    void OdbierzRefreshera();
-    void sygnal_od_agenta(int);
+    void OdbierzRefreshera();     //inicjuje przesyłanie stanu do gui
+    void sygnal_od_agenta(int);   //zdarzenia obserwowalne, czyli sygnały o zakończeniu akcji przez agenta o podanym id
 
 private:
     QMutex Mutex_stan;
     QMutex Mutex_zadania;
-    void InicjujStanRobotow();
-    double time();
+
+    void InicjujStanRobotow(); //inicjujemy macierz robotow
+    double time();             //funkcja zwraca czas symulacji z t i dt
     void InicjalizujWektorPolek();    //Przypisuje wszystkim polką stany poczatkowe
     void OdswierzMacierzStanu();      //odswierza macierz stanu na podstawie polorzenia polek (i w przyszlosci roborów i zarezerwowanych pól)
     void InicjalizujMacierzStanu();   //alokuje pamięc dla macierzy stanu
     coordinates AdresStanowsika(int); // zwraca adres stanowiska
-    void InicjujMacierzZadan();
-    bool DodajZadanie(int,int);
-    void UsunZadanie(int);
-    void ObslurzZadania0();
-    void ObslurzZadania1();
-    void ObslurzZadania2();
-    void ObslurzZadania3();
-    void ObslurzZadania4();
-    void ObslurzZadania5();
-    void ObslurzUsuwanie();
+    void InicjujMacierzZadan();       //inicjuje macierz zadan
+    bool DodajZadanie(int,int);       //dodaje zadanie do macierzy
+    void UsunZadanie(int);            //usuwa zadanie z macierzy i przesuwa kolejne zadania tak by zapełnić pustkę i utrzymać kolejność
+
+    //obsluga zadan
+    void ObslurzZadania1();  //oczekujące na realizacje
+    void ObslurzZadania2();  //robot kieruje się do półki
+    void ObslurzZadania3();  //robot jedzie z półka na przeładunek
+    void ObslurzZadania4();  //robot wraca z przeładunku
+    void ObslurzZadania5();  //robot kieruje się do wyjazdu z systemu
+    void ObslurzUsuwanie();  //usuwanie zakonczonych zadan
 };
 
 #endif // STEROWNIK_H

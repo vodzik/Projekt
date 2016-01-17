@@ -11,11 +11,21 @@ sterownik::sterownik(QWidget *parent)
     OdswierzMacierzStanu();
     agent = new Smith (this);
     connect(agent,SIGNAL(clock(int,int)),this,SLOT(OdbierzZegar(int,int)));
-    connect(this,SIGNAL(polecenie_dla_agenta(int)),agent,SLOT(slot1(int)));
+    connect(this,SIGNAL(polecenie_dla_agenta(int,int)),agent,SLOT(slot1(int,int)));
     connect(agent,SIGNAL(sygnal1(int)),this,SLOT(sygnal_od_agenta(int)));
     agent->start();
     InicjujMacierzZadan();
     InicjujStanRobotow();
+
+    czas_rochu=500;
+    czas_zaladunku=1500;
+    czas_obslogi=5000;
+    czas_rozladunku=1500;
+    czas_wyjscia=500;
+    kolejka[0]=0;
+    kolejka[1]=0;
+    kolejka[2]=0;
+    kolejka[3]=0;
 
 }
 
@@ -33,6 +43,7 @@ void sterownik::run()
         ObslurzZadania4();
         ObslurzZadania3();
         ObslurzZadania2();
+
         ObslurzZadania1();
         if(flaga_nowych_zadan)WyslijZadania();
         flaga_nowych_zadan=0;
@@ -77,9 +88,9 @@ void sterownik::ObslurzZadania1()
     QString Logi;
     Mutex_zadania.lock();
     Mutex_stan.lock();
-    while(i<100&&tablicazadan[i].stan!=0)
+    while(i<1000&&tablicazadan[i].stan!=0)
     {
-       if((i<100&&tablicazadan[i].stan==1)&&(stan[15][25]==0)&&(licznikzadanaktywnych<20)&&(polki[tablicazadan[i].numerPolki].zarezerwowana==0))
+       if((i<1000&&tablicazadan[i].stan==1)&&(stan[15][25]==0)&&(licznikzadanaktywnych<20)&&(polki[tablicazadan[i].numerPolki].zarezerwowana==0)&&(kolejka[tablicazadan[i].numerStanowiska-1]<8))
        {
        polki[tablicazadan[i].numerPolki].zarezerwowana=1;
        while(Roboty[j].polorzenie.active)j++;
@@ -97,12 +108,13 @@ void sterownik::ObslurzZadania1()
        Roboty[j].usun=0;
        stan[15][25]=3;
        licznikzadanaktywnych++;
+       kolejka[tablicazadan[i].numerStanowiska-1]++;
        Logi=QString::number(time(),'g',6)+"s";
-       Logi+=" Robot nr. "+ QString::number(j)+" otrzymał zadanie nr. "+QString::number(tablicazadan[i].id_wyswietlane)+ " i wszedł do systemu" ;
+       Logi+=" Robot nr. "+ QString::number(j)+" otrzymał zadanie nr. "+QString::number(tablicazadan[i].id_wyswietlane)+ " i wszedł do systemu." ;
        WyslijLogi(Logi);
        //WyslijZadania();
        flaga_nowych_zadan=1;
-       i=100;
+       i=1000;
        }
     i++;
     }
@@ -122,9 +134,9 @@ void sterownik::ObslurzZadania2()
     int nr_polki;
     Mutex_zadania.lock();
     Mutex_stan.lock();
-    while(i<100&&tablicazadan[i].stan!=0)
+    while(i<1000&&tablicazadan[i].stan!=0)
     {
-       if((i<100&&tablicazadan[i].stan==2))
+       if((i<1000&&tablicazadan[i].stan==2))
        {
 
            j=tablicazadan[i].id_robota;
@@ -180,13 +192,13 @@ void sterownik::ObslurzZadania2()
                 {
                 Roboty[j].pracuje=1;
                 Roboty[j].przeladunek=1;
-                emit polecenie_dla_agenta(j);
+                emit polecenie_dla_agenta(j,czas_zaladunku);
 
                 }
                else if(Roboty[j].cango())
                 {
                 Roboty[j].pracuje=1;
-                emit polecenie_dla_agenta(j);
+                emit polecenie_dla_agenta(j,czas_rochu);
                 }
 
            }
@@ -195,6 +207,10 @@ void sterownik::ObslurzZadania2()
            {
                flaga_nowych_zadan=1;
                tablicazadan[i].stan=3;
+
+               Logi=QString::number(time(),'g',6)+"s";
+               Logi+=" Robot nr. "+ QString::number(j)+" załadował półkę nr. "+QString::number(tablicazadan[i].numerPolki)+ " (zandnie "+ QString::number(tablicazadan[i].id_wyswietlane) +")." ;
+               WyslijLogi(Logi);
 
            }
 
@@ -219,9 +235,9 @@ void sterownik::ObslurzZadania3()
     int nr_stanowiska;
     Mutex_zadania.lock();
     Mutex_stan.lock();
-    while(i<100&&tablicazadan[i].stan!=0)
+    while(i<1000&&tablicazadan[i].stan!=0)
     {
-       if((i<100&&tablicazadan[i].stan==3))
+       if((i<1000&&tablicazadan[i].stan==3))
        {
 
            j=tablicazadan[i].id_robota;
@@ -311,18 +327,23 @@ void sterownik::ObslurzZadania3()
                 {
                 Roboty[j].pracuje=1;
                 Roboty[j].przetwarzanie=1;
-                emit polecenie_dla_agenta(j);
+                emit polecenie_dla_agenta(j,czas_obslogi);
                 }
                else if(Roboty[j].cango())
                 {
                 Roboty[j].pracuje=1;
-                emit polecenie_dla_agenta(j);
+                emit polecenie_dla_agenta(j,czas_rochu);
                 }
 
            }
 
            else
            {
+               Logi=QString::number(time(),'g',6)+"s";
+               Logi+=" Obsłużono półkę nr. "+QString::number(tablicazadan[i].numerPolki)+ " (zandnie "+ QString::number(tablicazadan[i].id_wyswietlane) +")." ;
+               WyslijLogi(Logi);
+
+               kolejka[tablicazadan[i].numerStanowiska-1]--;
                tablicazadan[i].stan=4;
                flaga_nowych_zadan=1;
 
@@ -348,9 +369,9 @@ void sterownik::ObslurzZadania4()
     int nr_polki;
     Mutex_zadania.lock();
     Mutex_stan.lock();
-    while(i<100&&tablicazadan[i].stan!=0)
+    while(i<1000&&tablicazadan[i].stan!=0)
     {
-       if((i<100&&tablicazadan[i].stan==4))
+       if((i<1000&&tablicazadan[i].stan==4))
        {
 
            j=tablicazadan[i].id_robota;
@@ -429,21 +450,27 @@ void sterownik::ObslurzZadania4()
                 {
                 Roboty[j].pracuje=1;
                 Roboty[j].przeladunek=1;
-                emit polecenie_dla_agenta(j);
+                emit polecenie_dla_agenta(j,czas_rozladunku);
 
                 }
                else if(Roboty[j].cango())
                 {
                 Roboty[j].pracuje=1;
-                emit polecenie_dla_agenta(j);
+                emit polecenie_dla_agenta(j,czas_rochu);
                 }
 
            }
 
            else
            {
+
+               Logi=QString::number(time(),'g',6)+"s";
+               Logi+=" Robot nr. "+ QString::number(j)+" wyładował półkę nr. "+QString::number(tablicazadan[i].numerPolki)+ " (zandnie "+ QString::number(tablicazadan[i].id_wyswietlane) +")." ;
+               WyslijLogi(Logi);
+
                tablicazadan[i].stan=5;
                flaga_nowych_zadan=1;
+
 
            }
 
@@ -470,9 +497,9 @@ void sterownik::ObslurzZadania5()
     int nr_stanowiska;
     Mutex_zadania.lock();
     Mutex_stan.lock();
-    while(i<100&&tablicazadan[i].stan!=0)
+    while(i<1000&&tablicazadan[i].stan!=0)
     {
-       if((i<100&&tablicazadan[i].stan==5))
+       if((i<1000&&tablicazadan[i].stan==5))
        {
 
            j=tablicazadan[i].id_robota;
@@ -531,17 +558,22 @@ void sterownik::ObslurzZadania5()
                 {
                 Roboty[j].pracuje=1;
                 Roboty[j].usuwanie=1;
-                emit polecenie_dla_agenta(j);
+                emit polecenie_dla_agenta(j,czas_wyjscia);
                 }
                else if(Roboty[j].cango())
                 {
                 Roboty[j].pracuje=1;
-                emit polecenie_dla_agenta(j);
+                emit polecenie_dla_agenta(j,czas_rochu);
                 }
 
            }
            else
            {
+
+               Logi=QString::number(time(),'g',6)+"s";
+               Logi+=" Robot nr. "+ QString::number(j)+" wyjechał z systemu. Koniec zadania nr. "+ QString::number(tablicazadan[i].id_wyswietlane) +"." ;
+               WyslijLogi(Logi);
+
                tablicazadan[i].stan=6;
                flaga_nowych_zadan=1;
 
@@ -580,7 +612,7 @@ void sterownik::InicjujMacierzZadan()
 {
     Mutex_zadania.lock();
     int i;
-    for(i=0;i<100;i++)
+    for(i=0;i<1000;i++)
     {
         tablicazadan[i].stan=0;
         tablicazadan[i].numerPolki=0;
@@ -597,8 +629,8 @@ bool sterownik::DodajZadanie(int nrPolki, int nrStanowiska)
 {
     Mutex_zadania.lock();
     int i=0;
-    while(i<100&&tablicazadan[i].stan!=0) i++;
-    if (i==100)
+    while(i<1000&&tablicazadan[i].stan!=0) i++;
+    if (i==1000)
     {
         Mutex_zadania.unlock();
         return 1;
@@ -683,7 +715,7 @@ void sterownik::OdswierzMacierzStanu()
     }
     Mutex_zadania.lock();
     i=0;
-    while(i<100&&tablicazadan[i].stan!=0)
+    while(i<1000&&tablicazadan[i].stan!=0)
     {
         if(tablicazadan[i].stan==2||tablicazadan[i].stan==5)
         {
@@ -772,7 +804,7 @@ void sterownik::OdbierzZadanie(int npolki, int nstanowiska)
     QString log;
     log = QString::number(time(),'g',6);
     // wrzucenie zadania na listę
-    if(DodajZadanie(npolki,nstanowiska)==0)log=log + "s Dodano zadanie transportu polki " + QString::number(npolki)+ " na stanowisko "  + QString::number(nstanowiska)+ ". Id="+QString::number(licznikzadan);
+    if(DodajZadanie(npolki,nstanowiska)==0)log=log + "s Dodano zadanie transportu półki " + QString::number(npolki)+ " na stanowisko "  + QString::number(nstanowiska)+ ". Id="+QString::number(licznikzadan);
     else log=log+ "s Zadanie pominiente. Przekroczono limit ilości zadań";
     emit WyslijLogi(log);
 }
@@ -794,7 +826,7 @@ void sterownik::WyslijZadania()
 
     QString zadania="";
     int i=0;
-    while(i<100&&tablicazadan[i].stan!=0)
+    while(i<1000&&tablicazadan[i].stan!=0)
     {
         zadania+="id_zadania="+QString::number(tablicazadan[i].id_wyswietlane)+" numer_półki="+QString::number(tablicazadan[i].numerPolki)+" numer_stanowiska="+QString::number(tablicazadan[i].numerStanowiska)+" status=";
         if(tablicazadan[i].stan==1) zadania+="Oczekujące";
