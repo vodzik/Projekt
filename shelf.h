@@ -5,13 +5,14 @@
 class shelf
 {
 public:
-    int id;
-    coordinates polorzenie_aktualne;
-    coordinates polorzenie_bazowe;
+    int id;                            //identyfikator
+    coordinates polorzenie_aktualne;   //bierzace położenie
+    coordinates polorzenie_bazowe;     //położenie domyślne
+    bool zarezerwowana;                //czy jakiś robot jest już przypisany do półki?
     shelf();
 
-    bool CzyNaMiejscu();
-    int AlejkaBazowa();
+    bool CzyNaMiejscu();               //czy półka jest w pozycji bazowej?
+    int AlejkaBazowa();                //zwraca współżędną Y alejki przy ktorej jest pozycja bazowa półki
 
 
 };

@@ -20,13 +20,18 @@ MainWindow::MainWindow(QWidget *parent) :  //funkcja inicjująca MainWindow
     qsrand(QTime::currentTime().msec()); // inicjalizacja ciągu pseudolosowego;
 
     refreash = new refreasher(this);  //twoezenie instancji wątku zegara odświerzania
-    connect(refreash,SIGNAL(Tick()),this,SLOT(onTick())); //łaczenie sygnału odświeżania Tick() ze slotem onTick()
+   // connect(refreash,SIGNAL(Tick()),this,SLOT(onTick())); //łaczenie sygnału odświeżania Tick() ze slotem onTick()
+
     refreash->start();  //start wątku
 
 
     driver=new sterownik(this); //tworzenie instancji wątku sterownika
-    connect(driver,SIGNAL(Wyslijstan(int**)),this,SLOT(Odbierzstan(int**))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
+    connect(driver,SIGNAL(Wyslijstan(int**,double)),this,SLOT(Odbierzstan(int**,double))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
+    connect(driver,SIGNAL(WyslijLogi(QString)),this,SLOT(OdbierzLogi(QString))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
     connect(this,SIGNAL(WyslijZadanie(int,int)),driver,SLOT(OdbierzZadanie(int,int))); //łączenie sygnały Wyslijstan ze slotem Odbierzstan.
+    connect(driver,SIGNAL(WyslijZadania(QString)),this,SLOT(OdbierzListeZadan(QString)));
+    connect(refreash,SIGNAL(Tick()),driver,SLOT(OdbierzRefreshera())); //łaczenie sygnału odświeżania Tick() ze slotem OdbierzRefreshera w driverze
+
     driver->start();  //start wątku
 
     logi="Start";
@@ -45,8 +50,9 @@ void MainWindow::onTick() //obsługa sygnału Tick()
     rysuj();
 }
 
-void MainWindow::Odbierzstan(int **stana) //obsługa sygnału Odbierzstan()
+void MainWindow::Odbierzstan(int **stana, double time) //obsługa sygnału Odbierzstan()
 {
+    ui->czas->setText(QString::number(time,'f',1));
     int i,j;
     for(i=0;i<21;i++)
     {
@@ -56,6 +62,7 @@ void MainWindow::Odbierzstan(int **stana) //obsługa sygnału Odbierzstan()
             stan[i][j]=stana[i][j];
         }
     }
+    rysuj();
 }
 
 void MainWindow::rysuj()  //funkcja rysująca
@@ -3061,7 +3068,7 @@ void MainWindow::OdbierzListeZadan(QString zadania)
 
 void MainWindow::OdbierzLogi(QString nowelogi)
 {
-    logi+='\n';
-    logi+=nowelogi;
+    nowelogi+='\n';
+    logi=nowelogi+logi;
     ui->Logi->setText(logi);
 }

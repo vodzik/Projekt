@@ -1,7 +1,7 @@
 #ifndef ZADANIE_H
 #define ZADANIE_H
 
-#include <list>
+
 #include "coordinates.h"
 
 using namespace std;
@@ -9,16 +9,22 @@ using namespace std;
 class zadanie
 {
 public:
-    zadanie(int p, int s, coordinates pxy, coordinates sxy);
+    zadanie();
 
-    int liczbaKrokow;
+    zadanie(int p, int s);
+
+    int id_robota;
+    int id_wyswietlane; //określa jako otóre pojawiło się zadanie, nie odpowiada jego adresowi
     int numerPolki;
     int numerStanowiska;
-    coordinates wpolrzednePolki;
-    coordinates wspolrzedneStanowska;
+    int stan;  //0 - nieaktywne/puste
+               //1 - oczekujące na wysłanie agenta
+               //2 - agent jedzie do pułki
+               //3 - agent jedzie z pułką do przeładunku
+               //4 - agent jedzie z pułką do jej bazowej pozycji
+               //5 - agent wraca do wyjazdu
 
-    void GenerujScierzke();
 
-    list<coordinates> krok;
+
 };
 #endif // ZADANIE_H

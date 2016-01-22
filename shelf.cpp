@@ -14,9 +14,9 @@ bool shelf::CzyNaMiejscu()
 
 int shelf::AlejkaBazowa()
 {
-    if(polorzenie_bazowe.Y<=3)return 1;
-    if(polorzenie_bazowe.Y<=6)return 2;
-    if(polorzenie_bazowe.Y<=9)return 3;
-    if(polorzenie_bazowe.Y<=12)return 4;
-    return 5;
+    if(polorzenie_bazowe.Y<=3)return 2;
+    if(polorzenie_bazowe.Y<=6)return 5;
+    if(polorzenie_bazowe.Y<=9)return 8;
+    if(polorzenie_bazowe.Y<=12)return 11;
+    return 14;
 }
